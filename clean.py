@@ -72,6 +72,7 @@ def five_number(DataFrame, column):
 def print_info(DataFrame, devtype, ex_level, ed_level):
     print('\n')
     print('Type: ')
+    print(devtype)
     print(ex_level)
     print(ed_level)
     employee = DataFrame.loc[df['YearsCodingProf'].isin(ex_level)]
@@ -91,6 +92,13 @@ def print_info(DataFrame, devtype, ex_level, ed_level):
 def print_freq(DataFrame, column):
     frequency_df = DataFrame[column].value_counts()
     print(frequency_df, "\n")
+
+def print_salary(DataFrame, Gender):
+    employee = DataFrame.loc[DataFrame['Gender'] == Gender]
+
+    print('mean income ' + str(Gender) + ' employee:   ' + str(round(employee[GDP].mean(), 2)))
+    # print('mean income female employee: ' + str(round(femaleemployee[GDP].mean(), 2)))
+    # print('mean income other employee:   ' + str(round(otheremployee[GDP].mean(), 2)))
 
 if __name__ == '__main__':
     # Load data into a pandas DataFrame
@@ -123,11 +131,12 @@ if __name__ == '__main__':
     littlex = ['0-2 years', '3-5 years']
     lotofex = ['6-8 years', '9-11 years', '12-14 years', '15-17 years', '18-20 years', '21-23 years', '24-26 years', '27-29 years', '30 or more years']
 
+    print_salary(df, 'Female')
     print_info(df, 'Full-stack developer', lotofex, lowed)
 
     print_info(df, 'Full-stack developer', lotofex, highed)
 
-    print_info(df, 'C-suite executive (CEO, CTO, etc.)', lotofex, highed)
+    print_info(df, 'C-suite executive (CEO, CTO, etc.)', allex, alled)
 
 #     # Create GDP list and remove missing/outlying value(s)
 #     GDP_list = []
