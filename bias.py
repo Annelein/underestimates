@@ -12,7 +12,7 @@ import json
 
 
 INPUT_CSV = "survey_results_public_mega_inc.csv"
-COUNTRY = "Country"
+COUNTRY = "Gender"
 REGION = "FormalEducation"
 DENSITY = "AssessBenefits10"
 INFANT = "AssessBenefits11"
@@ -50,6 +50,9 @@ def central_tendency(DataFrame, column):
     Computes and prints the Central Tendency of a column
     """
     print(f'{column}\n'
+          f'count: {DataFrame[column].count()}\n'
+          f'max: {DataFrame[column].max()}\n'
+          f'min: {DataFrame[column].min()}\n'
           f'mean: {round(DataFrame[column].mean(), 2)}\n'
           f'median: {DataFrame[column].median()}\n'
           f'mode: {DataFrame[column].mode()}\n')
@@ -84,6 +87,9 @@ if __name__ == '__main__':
     central_tendency(df, GDP)
     five_number(df, INFANT)
 
+    frequency_df = df['Gender'].value_counts()
+    print(frequency_df)
+
     # Create GDP list and remove missing/outlying value(s)
     GDP_list = []
     GDP_list = df[GDP].tolist()
@@ -91,15 +97,15 @@ if __name__ == '__main__':
     GDP_cleanlist.remove(max(GDP_cleanlist))
 
     # Plot a histogram of the GDPs
-    plt.hist(GDP_cleanlist, 50)
-    plt.xlabel(GDP)
-    plt.ylabel('Countries')
-    plt.show()
+    # plt.hist(GDP_cleanlist, 50)
+    # plt.xlabel(GDP)
+    # plt.ylabel('Countries')
+    # plt.show()
 
-    # Plot a boxplot of the infant mortality
-    df[INFANT].plot.box()
-    plt.show()
+    # # Plot a boxplot of the infant mortality
+    # df[INFANT].plot.box()
+    # plt.show()
 
     # Write data to a json file
-    with open('eda.json', 'w') as outfile:
-        outfile.write(df.set_index(COUNTRY).to_json(orient='index'))
+    # with open('bias.json', 'w') as outfile:
+    #     outfile.write(df.set_index(COUNTRY).to_json(orient='index'))
