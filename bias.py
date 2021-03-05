@@ -12,8 +12,8 @@ import json
 
 
 INPUT_CSV = "survey_results_public_mega_inc.csv"
-COUNTRY = "Gender"
-REGION = "FormalEducation"
+GENDER = "Gender"
+FORMALED = "FormalEducation"
 DENSITY = "AssessBenefits10"
 INFANT = "AssessBenefits11"
 GDP = "ConvertedSalary"
@@ -24,7 +24,7 @@ def load_data(input):
     Loads data into a pandas DataFrame
     """
     df = pd.read_csv(input)
-    df = df.replace('unknown', np.nan)
+    df = df.replace('NA', np.nan)
     return df
 
 
@@ -72,11 +72,11 @@ if __name__ == '__main__':
     df = load_data(INPUT_CSV)
 
     # Select data from DataFrame
-    df = df[[COUNTRY, REGION, DENSITY, INFANT, GDP]]
+    # df = df[[GENDER, FORMALED, DENSITY, INFANT, GDP]]
 
     # Strip data where necessary
-    df[REGION] = df[REGION].str.strip()
-    df[COUNTRY] = df[COUNTRY].str.strip()
+    df[FORMALED] = df[FORMALED].str.strip()
+    df[GENDER] = df[GENDER].str.strip()
 
     # Convert relevant columns to floats
     # df = to_float(df, GDP)
@@ -87,8 +87,53 @@ if __name__ == '__main__':
     central_tendency(df, GDP)
     five_number(df, INFANT)
 
+    # frequency_df = df.loc[df['DevType'] == 'Full-stack developer']
     frequency_df = df['Gender'].value_counts()
-    print(frequency_df)
+    print(frequency_df, "\n")
+
+    frequency_df = df[FORMALED].value_counts()
+    print(frequency_df, "\n")
+
+    frequency_df = df['JobSatisfaction'].value_counts()
+    print(frequency_df, "\n")
+
+    case1 = df.loc[df['DevType'] == 'Full-stack developer']
+    case1 = case1.loc[df['DevType'] == 'Full-stack developer']
+    case1 = case1[FORMALED].value_counts()
+    print(case1, "\n")
+
+    # Mannen:
+    case1 = df.loc[df['Gender'] == 'Male']
+    case1 = case1.loc[df['DevType'] == 'Full-stack developer']
+    print("Male Full-stack developers: ")
+    print(case1.shape[0], "\n")
+    # case1 = case1.loc[df['DevType'] == 'Full-stack developer']
+    case1 = case1[FORMALED].value_counts()
+    print(case1, "\n")
+
+    # Vrouwen:
+    case1 = df.loc[df['Gender'] == 'Female']
+    case1 = case1.loc[df['DevType'] == 'Full-stack developer']
+    print("Female Full-stack developers: ")
+    print(case1.shape[0], "\n")
+    # case1 = case1.loc[df['DevType'] == 'Full-stack developer']
+    case1 = case1[FORMALED].value_counts()
+    print(case1, "\n")
+
+    frequency_df = df['YearsCoding'].value_counts()
+    print(frequency_df, "\n")
+
+    # henk = df.loc[df['YearsCoding'] == '3-5 years', '0-2 years']
+    henk = df.loc[df['YearsCoding'] <= '3-5 years']
+    henk = henk[[GENDER, FORMALED, GDP, 'YearsCoding', 'EducationParents']]
+
+    print(henk, "\n")
+
+
+
+    # result = df.head(10)
+    # print("First 10 rows of the DataFrame:")
+    # print(result)
 
     # Create GDP list and remove missing/outlying value(s)
     GDP_list = []
@@ -97,9 +142,9 @@ if __name__ == '__main__':
     GDP_cleanlist.remove(max(GDP_cleanlist))
 
     # Plot a histogram of the GDPs
-    # plt.hist(GDP_cleanlist, 50)
+    # plt.hist(GDP_cleanlist, 20)
     # plt.xlabel(GDP)
-    # plt.ylabel('Countries')
+    # plt.ylabel('Employees')
     # plt.show()
 
     # # Plot a boxplot of the infant mortality
@@ -108,4 +153,4 @@ if __name__ == '__main__':
 
     # Write data to a json file
     # with open('bias.json', 'w') as outfile:
-    #     outfile.write(df.set_index(COUNTRY).to_json(orient='index'))
+    #     outfile.write(df.set_index(GENDER).to_json(orient='index'))
