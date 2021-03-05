@@ -9,9 +9,12 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import json
+import awoc
+
 
 
 INPUT_CSV = "survey_results_public_mega_inc.csv"
+COUNTRY = "Country"
 GENDER = "Gender"
 FORMALED = "FormalEducation"
 YEARSCODINGPROF = "YearsCodingProf"
@@ -20,6 +23,8 @@ EMPLOYMENT = "Employment"
 DEVTYPE = "DevType"
 GDP = "ConvertedSalary"
 
+my_world = awoc.AWOC()
+countries_of_europe = my_world.get_countries_list_of('Europe')
 
 def load_data(input):
     """
@@ -70,23 +75,21 @@ def five_number(DataFrame, column):
 
 
 def print_info(DataFrame, devtype, ex_level, ed_level):
-    print('\n')
-    print('Type: ')
-    print(devtype)
-    print(ex_level)
-    print(ed_level)
-    employee = DataFrame.loc[df['YearsCodingProf'].isin(ex_level)]
+    # print(devtype)
+    # print(ex_level)
+    # print(ed_level)
+    employee = DataFrame.loc[df[YEARSCODINGPROF].isin(ex_level)]
     employee = employee.loc[df['DevType'] == devtype]
     employee = employee.loc[df['Employment'] == 'Employed full-time']
     employee = employee.loc[df[FORMALED].isin(ed_level)]
     print('amount of employees:         ' + str(employee.shape[0]))
     print('mean income employee:        ' + str(round(employee[GDP].mean(), 2)))
 
-    maleemployee = employee.loc[df['Gender'] == 'Male']
-    femaleemployee = employee.loc[df['Gender'] != 'Male']
-    print('mean income male employee:   ' + str(round(maleemployee[GDP].mean(), 2)))
-    print('mean income female employee: ' + str(round(femaleemployee[GDP].mean(), 2)))
-    print('\n')
+    # maleemployee = employee.loc[df['Gender'] == 'Male']
+    # femaleemployee = employee.loc[df['Gender'] != 'Male']
+    # print('mean income male employee:   ' + str(round(maleemployee[GDP].mean(), 2)))
+    # print('mean income female employee: ' + str(round(femaleemployee[GDP].mean(), 2)))
+    # print('\n')
     return employee
 
 def print_freq(DataFrame, column):
@@ -94,8 +97,13 @@ def print_freq(DataFrame, column):
     print(frequency_df, "\n")
 
 def print_salary(DataFrame, Gender):
-    employee = DataFrame.loc[DataFrame['Gender'] == Gender]
-
+    if Gender == 'other':
+        employee = DataFrame.loc[DataFrame['Gender'] != 'Male']
+        employee = employee.loc[DataFrame['Gender'] != 'Female']
+    elif Gender == 'all':
+        employee = DataFrame
+    else:
+        employee = DataFrame.loc[DataFrame['Gender'] == Gender]
     print('mean income ' + str(Gender) + ' employee:   ' + str(round(employee[GDP].mean(), 2)))
     # print('mean income female employee: ' + str(round(femaleemployee[GDP].mean(), 2)))
     # print('mean income other employee:   ' + str(round(otheremployee[GDP].mean(), 2)))
@@ -105,7 +113,7 @@ if __name__ == '__main__':
     df = load_data(INPUT_CSV)
 
     # Select data from DataFrame
-    df = df[[GENDER, FORMALED, GDP, YEARSCODINGPROF, YEARSCODING, EMPLOYMENT, DEVTYPE]]
+    df = df[[COUNTRY, GENDER, FORMALED, GDP, YEARSCODINGPROF, YEARSCODING, EMPLOYMENT, DEVTYPE]]
 
     # Strip data where necessary
     df[FORMALED] = df[FORMALED].str.strip()
@@ -131,29 +139,93 @@ if __name__ == '__main__':
     littlex = ['0-2 years', '3-5 years']
     lotofex = ['6-8 years', '9-11 years', '12-14 years', '15-17 years', '18-20 years', '21-23 years', '24-26 years', '27-29 years', '30 or more years']
 
+    # All
+    print_salary(df, 'all')
+    print_salary(df, 'Male')
     print_salary(df, 'Female')
-    print_info(df, 'Full-stack developer', lotofex, lowed)
+    print_salary(df, 'other')
 
-    print_info(df, 'Full-stack developer', lotofex, highed)
+    # Self-taught, little professional experience, low educated
+    print('Self-taught, little professional experience, low educated:')
+    self_taught = print_info(df, 'Full-stack developer', littlex, lowed)
+    print_salary(self_taught, 'Male')
+    print_salary(self_taught, 'Female')
+    print_salary(self_taught, 'other')
+    print('\n')
 
-    print_info(df, 'C-suite executive (CEO, CTO, etc.)', allex, alled)
+    # System-taught, little professional experience, high educated
+    print('System-taught, little professional experience, high educated')
+    system_taught = print_info(df, 'Full-stack developer', littlex, highed)
+    print_salary(system_taught, 'Male')
+    print_salary(system_taught, 'Female')
+    print_salary(system_taught, 'other')
+    print('\n')
 
-#     # Create GDP list and remove missing/outlying value(s)
-#     GDP_list = []
-#     GDP_list = df[GDP].tolist()
-#     GDP_cleanlist = [x for x in GDP_list if str(x) != 'nan']
-#     GDP_cleanlist.remove(max(GDP_cleanlist))
+    all_emp = print_info(df, 'Full-stack developer', littlex, alled)
+    all_EU = all_emp.loc[df['Country'].isin(countries_of_europe)]
+    all_US = all_emp.loc[df['Country'] == 'United States']
+
+    print('\n')
+    print('All EU Full-stack developers, little experienced:')
+    print_salary(all_EU, 'all')
+    print_salary(all_EU, 'Male')
+    print_salary(all_EU, 'Female')
+    print_salary(all_EU, 'other')
+    print('\n')
+
+    print('All US Full-stack developers, little experienced:')
+    print_salary(all_US, 'all')
+    print_salary(all_US, 'Male')
+    print_salary(all_US, 'Female')
+    print_salary(all_US, 'other')
+    print('\n')
+
+    system_taught_EU = system_taught.loc[df['Country'].isin(countries_of_europe)]
+    system_taught_US = system_taught.loc[df['Country'] == 'United States']
+    self_taught_EU = self_taught.loc[df['Country'].isin(countries_of_europe)]
+    self_taught_US = self_taught.loc[df['Country'] == 'United States']
+
+    # System-taught, little professional experience, high educated
+    print('System-taught US:')
+    system_taught = print_info(system_taught_US, 'Full-stack developer', littlex, highed)
+    print_salary(system_taught, 'Male')
+    print_salary(system_taught, 'Female')
+    print_salary(system_taught, 'other')
+    print('\n')
+
+    # System-taught, little professional experience, high educated
+    print('System-taught EU:')
+    system_taught = print_info(system_taught_EU, 'Full-stack developer', littlex, highed)
+    print_salary(system_taught, 'Male')
+    print_salary(system_taught, 'Female')
+    print_salary(system_taught, 'other')
+    print('\n')
+
+     # Self-taught, little professional experience, low educated
+    print('Self-taught US:')
+    self_taught = print_info(self_taught_US, 'Full-stack developer', littlex, lowed)
+    print_salary(self_taught, 'Male')
+    print_salary(self_taught, 'Female')
+    print_salary(self_taught, 'other')
+    print('\n')
+
+     # Self-taught, little professional experience, low educated
+    print('Self-taught EU:')
+    self_taught = print_info(self_taught_EU, 'Full-stack developer', littlex, lowed)
+    print_salary(self_taught, 'Male')
+    print_salary(self_taught, 'Female')
+    print_salary(self_taught, 'other')
+    print('\n')
+
+
+    # Create GDP list and remove missing/outlying value(s)
+    GDP_list = []
+    GDP_list = df[GDP].tolist()
+    GDP_cleanlist = [x for x in GDP_list if str(x) != 'nan']
+    GDP_cleanlist.remove(max(GDP_cleanlist))
 
     # Plot a histogram of the GDPs
-    # plt.hist(GDP_cleanlist, 20)
-    # plt.xlabel(GDP)
-    # plt.ylabel('Employees')
-    # plt.show()
-
-    # # Plot a boxplot of the infant mortality
-    # df[INFANT].plot.box()
-    # plt.show()
-
-    # Write data to a json file
-    # with open('bias.json', 'w') as outfile:
-    #     outfile.write(df.set_index(GENDER).to_json(orient='index'))
+    plt.hist(GDP_cleanlist, 20)
+    plt.xlabel(GDP)
+    plt.ylabel('Employees')
+    plt.show()
