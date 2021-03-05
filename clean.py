@@ -4,14 +4,11 @@
 Exploratory Data Analysis
 """
 
-
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import json
 import awoc
-
-
 
 INPUT_CSV = "survey_results_public_mega_inc.csv"
 COUNTRY = "Country"
@@ -75,21 +72,12 @@ def five_number(DataFrame, column):
 
 
 def print_info(DataFrame, devtype, ex_level, ed_level):
-    # print(devtype)
-    # print(ex_level)
-    # print(ed_level)
     employee = DataFrame.loc[df[YEARSCODINGPROF].isin(ex_level)]
     employee = employee.loc[df['DevType'] == devtype]
     employee = employee.loc[df['Employment'] == 'Employed full-time']
     employee = employee.loc[df[FORMALED].isin(ed_level)]
     print('amount of employees:         ' + str(employee.shape[0]))
     print('mean income employee:        ' + str(round(employee[GDP].mean(), 2)))
-
-    # maleemployee = employee.loc[df['Gender'] == 'Male']
-    # femaleemployee = employee.loc[df['Gender'] != 'Male']
-    # print('mean income male employee:   ' + str(round(maleemployee[GDP].mean(), 2)))
-    # print('mean income female employee: ' + str(round(femaleemployee[GDP].mean(), 2)))
-    # print('\n')
     return employee
 
 def print_freq(DataFrame, column):
@@ -105,8 +93,6 @@ def print_salary(DataFrame, Gender):
     else:
         employee = DataFrame.loc[DataFrame['Gender'] == Gender]
     print('mean income ' + str(Gender) + ' employee:   ' + str(round(employee[GDP].mean(), 2)))
-    # print('mean income female employee: ' + str(round(femaleemployee[GDP].mean(), 2)))
-    # print('mean income other employee:   ' + str(round(otheremployee[GDP].mean(), 2)))
 
 if __name__ == '__main__':
     # Load data into a pandas DataFrame
@@ -119,14 +105,9 @@ if __name__ == '__main__':
     df[FORMALED] = df[FORMALED].str.strip()
     df[GENDER] = df[GENDER].str.strip()
 
-    # Convert relevant columns to floats
-    # df = to_float(df, GDP)
-    # df = to_float(df, INFANT)
-    # df = to_float(df, DENSITY)
-
     # Print descriptive statistics
-    # central_tendency(df, GDP)
-    # five_number(df, INFANT)
+    central_tendency(df, GDP)
+    five_number(df, GDP)
 
     print_freq(df, GENDER)
     print_freq(df, FORMALED)
